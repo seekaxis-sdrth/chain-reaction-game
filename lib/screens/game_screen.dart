@@ -20,6 +20,7 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   late GameState _gameState;
+  bool _winDialogShown = false;
 
   @override
   void initState() {
@@ -88,6 +89,7 @@ class _GameScreenState extends State<GameScreen> {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
+              _winDialogShown = false;
               _gameState.reset();
             },
             child: const Text('Play Again', style: TextStyle(fontSize: 16)),
@@ -119,14 +121,18 @@ class _GameScreenState extends State<GameScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Restart',
-            onPressed: () => _gameState.reset(),
+            onPressed: () {
+              _winDialogShown = false;
+              _gameState.reset();
+            },
           ),
         ],
       ),
       body: ListenableBuilder(
         listenable: _gameState,
         builder: (context, _) {
-          if (_gameState.isGameOver) {
+          if (_gameState.isGameOver && !_winDialogShown) {
+            _winDialogShown = true;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (_gameState.isGameOver) _showWinDialog();
             });
