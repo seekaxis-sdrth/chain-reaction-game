@@ -10,6 +10,7 @@ class CellWidget extends StatefulWidget {
   final bool isCurrentPlayerCell;
   final VoidCallback onTap;
   final List<Player> players;
+  final Color turnColor;
 
   const CellWidget({
     super.key,
@@ -19,6 +20,7 @@ class CellWidget extends StatefulWidget {
     required this.isCurrentPlayerCell,
     required this.onTap,
     required this.players,
+    required this.turnColor,
   });
 
   @override
@@ -65,11 +67,11 @@ class _CellWidgetState extends State<CellWidget>
           return Container(
             decoration: BoxDecoration(
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.15),
+                color: widget.turnColor.withValues(alpha: 0.2),
                 width: 0.5,
               ),
               color: widget.canPlace && widget.cell.isEmpty
-                  ? Colors.white.withValues(alpha: 0.04)
+                  ? widget.turnColor.withValues(alpha: 0.06)
                   : Colors.transparent,
             ),
             child: Stack(

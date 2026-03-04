@@ -12,12 +12,25 @@ class GameBoard extends StatelessWidget {
     return ListenableBuilder(
       listenable: gameState,
       builder: (context, _) {
+        final turnColor = gameState.currentPlayer.color;
+
         return AspectRatio(
           aspectRatio: gameState.cols / gameState.rows,
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.white24, width: 1),
+              border: Border.all(
+                color: turnColor.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
               borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: turnColor.withValues(alpha: 0.15),
+                  blurRadius: 12,
+                  spreadRadius: 2,
+                ),
+              ],
             ),
             clipBehavior: Clip.antiAlias,
             child: Column(
@@ -35,6 +48,7 @@ class GameBoard extends StatelessWidget {
                               cell.owner == gameState.currentPlayer.id,
                           onTap: () => gameState.placeOrb(row, col),
                           players: gameState.players,
+                          turnColor: turnColor,
                         ),
                       );
                     }),
