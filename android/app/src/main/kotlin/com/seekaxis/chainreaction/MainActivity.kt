@@ -1,4 +1,4 @@
-package com.chainreaction.chain_reaction_game
+package com.seekaxis.chainreaction
 
 import io.flutter.embedding.android.FlutterActivity
 
