@@ -12,6 +12,7 @@ class GameState extends ChangeNotifier {
   bool _isAnimating = false;
   int _turnCount = 0;
   int? _winnerId;
+  int _generation = 0;
   final List<List<int>> _explosionQueue = [];
 
   GameState({
@@ -54,6 +55,8 @@ class GameState extends ChangeNotifier {
   Future<void> placeOrb(int row, int col) async {
     if (!canPlace(row, col)) return;
 
+    final gen = _generation;
+
     _isAnimating = true;
     notifyListeners();
 
@@ -61,7 +64,9 @@ class GameState extends ChangeNotifier {
     grid[row][col].owner = currentPlayer.id;
     notifyListeners();
 
-    await _processExplosions(row, col);
+    await _processExplosions(row, col, gen);
+
+    if (gen != _generation) return;
 
     _isAnimating = false;
     _turnCount++;
@@ -75,7 +80,7 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _processExplosions(int startRow, int startCol) async {
+  Future<void> _processExplosions(int startRow, int startCol, int gen) async {
     _explosionQueue.clear();
 
     if (grid[startRow][startCol].orbs >= criticalMass(startRow, startCol)) {
@@ -86,6 +91,8 @@ class GameState extends ChangeNotifier {
     const maxIterations = 1000;
 
     while (_explosionQueue.isNotEmpty && safetyCounter < maxIterations) {
+      if (gen != _generation) return;
+
       safetyCounter++;
       final current = _explosionQueue.removeAt(0);
       final r = current[0];
@@ -114,6 +121,7 @@ class GameState extends ChangeNotifier {
       notifyListeners();
       await Future.delayed(const Duration(milliseconds: 80));
 
+      if (gen != _generation) return;
       if (_checkWinCondition()) return;
     }
   }
@@ -161,10 +169,12 @@ class GameState extends ChangeNotifier {
   }
 
   void reset() {
+    _generation++;
     _currentPlayerIndex = 0;
     _turnCount = 0;
     _winnerId = null;
     _isAnimating = false;
+    _explosionQueue.clear();
     for (final player in players) {
       player.isAlive = true;
     }

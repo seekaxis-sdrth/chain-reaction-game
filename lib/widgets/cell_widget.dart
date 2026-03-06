@@ -37,7 +37,24 @@ class _CellWidgetState extends State<CellWidget>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
-    )..repeat();
+    );
+    _syncTicker();
+  }
+
+  @override
+  void didUpdateWidget(CellWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncTicker();
+  }
+
+  void _syncTicker() {
+    final needsAnimation = !widget.cell.isEmpty;
+    if (needsAnimation && !_controller.isAnimating) {
+      _controller.repeat();
+    } else if (!needsAnimation && _controller.isAnimating) {
+      _controller.stop();
+      _controller.reset();
+    }
   }
 
   @override
